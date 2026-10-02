@@ -1,0 +1,51 @@
+-- Bước 1: Sử dụng cơ sở dữ liệu classicmodels
+USE classicmodels;
+
+-- ========================================================
+-- PHẦN 1: KHẢO SÁT HIỆU NĂNG BAN ĐẦU (CHƯA CÓ INDEX)
+-- ========================================================
+
+-- Kiểm tra kế hoạch thực thi (Execution Plan) trước khi đánh Index cho cột customerName
+EXPLAIN 
+SELECT * 
+FROM customers 
+WHERE customerName = 'Land of Toys Inc.';
+
+
+-- ========================================================
+-- PHẦN 2: TẠO VÀ SỬ DỤNG INDEX CHO MỘT CỘT (SINGLE INDEX)
+-- ========================================================
+
+-- Thêm chỉ mục (Index) cho cột customerName
+ALTER TABLE customers 
+ADD INDEX idx_customerName(customerName);
+
+-- Kiểm tra lại kế hoạch thực thi sau khi đã tạo Index
+EXPLAIN 
+SELECT * 
+FROM customers 
+WHERE customerName = 'Land of Toys Inc.';
+
+
+-- ========================================================
+-- PHẦN 3: TẠO VÀ SỬ DỤNG INDEX THEO CẶP (COMPOSITE INDEX)
+-- ========================================================
+
+-- Thêm index theo cặp cho cột contactFirstName và contactLastName
+ALTER TABLE customers 
+ADD INDEX idx_full_name(contactFirstName, contactLastName);
+
+-- Kiểm tra truy vấn sử dụng Composite Index
+EXPLAIN 
+SELECT * 
+FROM customers 
+WHERE contactFirstName = 'Jean' OR contactFirstName = 'King';
+
+
+-- ========================================================
+-- PHẦN 4: HƯỚNG DẪN XÓA CHỈ MỤC (DROP INDEX) KHI CẦN THIẾT
+-- ========================================================
+
+-- Xóa chỉ mục idx_full_name đã tạo ở trên khỏi bảng customers
+ALTER TABLE customers 
+DROP INDEX idx_full_name;
